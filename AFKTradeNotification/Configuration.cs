@@ -1,4 +1,4 @@
-﻿public class Config
+﻿public class Configuration
 {
     public string FilePath { get; set; }
     public string DiscordWebhookUrl { get; set; }
