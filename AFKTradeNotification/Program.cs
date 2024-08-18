@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
+using AFKTradeNotification.Helpers;
 
 class Program
 {
@@ -9,7 +10,7 @@ class Program
     private static string discordId;
 
     private const string configFilePath = "config.json";
-    private const int defaultIntervalDelayInMS = 5000;
+    private const int defaultIntervalDelayInMS = 100;
 
     static void Main(string[] args)
     {
@@ -36,18 +37,17 @@ class Program
             if (messageToIgnore.Any(x => lastLine.Contains(x)))
                 continue;
 
-            Console.WriteLine($"Nouvelle ligne : {lastLine}");
+            Console.WriteLine($"New line : {lastLine}");
 
             if (lastLine.Contains("Hi, I would like to buy your"))
             {
-                var userMatch = Regex.Match(lastLine, @"\s*([\w\s]+):\s*Hi, I would like to buy your");
-                string user = userMatch.Success ? userMatch.Groups[1].Value.Trim() : "Inconnu";
+                string user = TradeNotificationHelper.GetUserName(lastLine);
 
                 var itemPriceMatch = Regex.Match(lastLine, @"Hi, I would like to buy your (.*?) listed for (\d+\s\w+)");
-                string item = itemPriceMatch.Success ? itemPriceMatch.Groups[1].Value.Trim() : "Inconnu";
-                string price = itemPriceMatch.Success ? itemPriceMatch.Groups[2].Value.Trim() : "Inconnu";
+                string item = itemPriceMatch.Success ? itemPriceMatch.Groups[1].Value.Trim() : TradeNotificationHelper.defaultItem;
+                string price = itemPriceMatch.Success ? itemPriceMatch.Groups[2].Value.Trim() : TradeNotificationHelper.defaultPrice;
 
-                string message = $"**Nouveau trade pour <@{discordId}>:**\n" +
+                string message = $"**New trade for <@{discordId}>:**\n" +
                                  $"- **User:** {user}\n" +
                                  $"- **Item:** {item}\n" +
                                  $"- **Price:** {price}\n" +
@@ -64,7 +64,7 @@ class Program
         {
             if (!File.Exists(configFilePath))
             {
-                Console.WriteLine("Fichier de configuration non trouvé.");
+                Console.WriteLine("Configuration file not found.");
                 Environment.Exit(1);
             }
 
@@ -77,7 +77,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Erreur lors du chargement de la configuration : {ex.Message}");
+            Console.WriteLine($"An error occured while loading the configuration file : {ex.Message}");
             Environment.Exit(1);
         }
     }
@@ -87,17 +87,25 @@ class Program
         try
         {
             string lastLine = null;
+            string penultimateLine = null;
             using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (StreamReader sr = new StreamReader(fs))
             {
                 while (!sr.EndOfStream)
+                {
+                    penultimateLine = lastLine;
                     lastLine = sr.ReadLine();
+                }
             }
+
+            if (lastLine != null && lastLine.Contains("afk", StringComparison.OrdinalIgnoreCase))
+                return penultimateLine;
+
             return lastLine;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Erreur lors de la lecture du fichier : {ex.Message}");
+            Console.WriteLine($"An error occured while reading the file : {ex.Message}");
             return null;
         }
     }
@@ -118,14 +126,15 @@ class Program
 
                 var response = await client.PostAsync(webhookUrl, data);
                 if (response.IsSuccessStatusCode)
-                    Console.WriteLine("Message envoyé avec succès sur Discord.");
+                    Console.WriteLine("Notification successfully sent on Discord");
                 else
-                    Console.WriteLine($"Erreur lors de l'envoi du message Discord : {response.StatusCode}");
+                    Console.WriteLine($"An error occured while sending the Discord notification : {response.StatusCode}");
+                    
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Erreur lors de l'envoi du message Discord : {ex.Message}");
+            Console.WriteLine($"An error occured while sending the Discord notification : {ex.Message}");
         }
     }
 }
