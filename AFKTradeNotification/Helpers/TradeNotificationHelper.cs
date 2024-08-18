@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AFKTradeNotification.Helpers;
-
+﻿namespace AFKTradeNotification.Helpers;
 public class TradeNotificationHelper
 {
     public const string defaultUser = "Unknown sender";
