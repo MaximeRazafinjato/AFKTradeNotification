@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 class Program
 {
     private static string filePath;
-    private static string destinationPath;
     private static string discordWebhookUrl;
     private static string discordId;
 
@@ -28,8 +27,7 @@ class Program
         {
             Thread.Sleep(defaultIntervalDelayInMS);
 
-            CopyFile(filePath, destinationPath);
-            string newLine = ReadLastLine(destinationPath);
+            string newLine = ReadLastLine(filePath);
 
             if (newLine == null || newLine == lastLine)
                 continue;
@@ -74,7 +72,6 @@ class Program
             var config = JsonConvert.DeserializeObject<Config>(json);
 
             filePath = config.FilePath;
-            destinationPath = config.DestinationPath;
             discordWebhookUrl = config.DiscordWebhookUrl;
             discordId = config.DiscordId;
         }
@@ -90,7 +87,8 @@ class Program
         try
         {
             string lastLine = null;
-            using (StreamReader sr = new StreamReader(filePath))
+            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (StreamReader sr = new StreamReader(fs))
             {
                 while (!sr.EndOfStream)
                     lastLine = sr.ReadLine();
@@ -101,18 +99,6 @@ class Program
         {
             Console.WriteLine($"Erreur lors de la lecture du fichier : {ex.Message}");
             return null;
-        }
-    }
-
-    private static void CopyFile(string sourcePath, string destinationPath)
-    {
-        try
-        {
-            File.Copy(sourcePath, destinationPath, true);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Erreur lors de la copie du fichier : {ex.Message}");
         }
     }
 

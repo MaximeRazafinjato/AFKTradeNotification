@@ -31,7 +31,6 @@ Before running the application, you need to configure the following settings. Yo
    ```json
    {
        "FilePath": "Path to the log file you want to monitor",
-       "DestinationPath": "Path to the temporary file where the log will be copied",
        "DiscordWebhookUrl": "Your Discord webhook URL for sending notifications",
        "DiscordId": "Your Discord user ID for mentions"
    }
