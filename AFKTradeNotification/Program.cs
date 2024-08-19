@@ -36,9 +36,7 @@ class Program
             {
                 string user = TradeNotificationHelper.GetUserName(lastLine);
 
-                var itemPriceMatch = Regex.Match(lastLine, @"Hi, I would like to buy your (.*?) listed for (\d+\s\w+)");
-                string item = itemPriceMatch.Success ? itemPriceMatch.Groups[1].Value.Trim() : TradeNotificationHelper.defaultItem;
-                string price = itemPriceMatch.Success ? itemPriceMatch.Groups[2].Value.Trim() : TradeNotificationHelper.defaultPrice;
+                var (item, price) = TradeNotificationHelper.GetItemAndPrice(lastLine);
 
                 string message = $"**New trade for <@{config.DiscordId}>:**\n" +
                                  $"- **User:** {user}\n" +
