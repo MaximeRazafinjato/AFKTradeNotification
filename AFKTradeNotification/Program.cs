@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using AFKTradeNotification.Helpers;
 class Program
 {
@@ -45,6 +45,7 @@ class Program
                                  $"- **Message:** {Regex.Replace(lastLine, @"^.*@From", "@From")}";
 
                 DiscordHelper.SendDiscordMessage(config.DiscordWebhookUrl, message);
+                EmailHelper.SendEmail(config, "New trade notification", message);
             }
         }
     }

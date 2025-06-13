@@ -9,6 +9,7 @@ The **AFKTradeNotification** is a .NET console application designed to monitor a
 - Monitors a log file for new trade requests.
 - Extracts relevant information (user, item, price) from the messages.
 - Sends a customized notification to a Discord channel when a trade request is detected.
+- Sends the same notification by email using SMTP settings.
 - Uses an external configuration file or environment variables to manage sensitive settings.
 
 ## Technologies Used
@@ -29,11 +30,17 @@ Before running the application, you need to configure the following settings. Yo
    Create a file named `config.json` in the same directory as the executable. Example content for `config.json`:
 
    ```json
-   {
-       "FilePath": "Path to the log file you want to monitor",
-       "DiscordWebhookUrl": "Your Discord webhook URL for sending notifications",
-       "DiscordId": "Your Discord user ID for mentions"
-   }
+    {
+        "FilePath": "Path to the log file you want to monitor",
+        "DiscordWebhookUrl": "Your Discord webhook URL for sending notifications",
+        "DiscordId": "Your Discord user ID for mentions",
+        "SmtpServer": "SMTP server address",
+        "SmtpPort": 587,
+        "SmtpUser": "Your SMTP username",
+        "SmtpPassword": "Your SMTP password",
+        "EmailFrom": "sender@example.com",
+        "EmailTo": "recipient@example.com"
+    }
    ```
 
 ## Obtaining Your Discord ID and Webhook URL
